@@ -29,6 +29,8 @@ import { ImageUploader } from '@/components/ImageUploader';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { PhoneInput } from '@/components/PhoneInput';
+import { OperatingHoursInput } from '@/components/OperatingHoursInput';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
@@ -244,7 +246,7 @@ const EditRestaurantPage = () => {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(11) 99999-9999" {...field} />
+                      <PhoneInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -270,7 +272,7 @@ const EditRestaurantPage = () => {
                   <FormItem>
                     <FormLabel>Horário de Funcionamento</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Ex: Seg-Sex: 11h-23h, Sáb: 12h-00h" {...field} />
+                      <OperatingHoursInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
