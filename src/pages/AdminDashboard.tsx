@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProfileStore } from '@/stores/profileStore';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UsersTable } from '@/components/admin/UsersTable';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RestaurantsTable } from '@/components/admin/RestaurantsTable';
 import { showError } from '@/utils/toast';
 
 const AdminDashboard = () => {
@@ -40,14 +40,7 @@ const AdminDashboard = () => {
           <UsersTable />
         </TabsContent>
         <TabsContent value="restaurants" className="mt-4">
-           <Card>
-            <CardHeader>
-              <CardTitle>Gerenciar Restaurantes</CardTitle>
-              <CardDescription>
-                Esta funcionalidade será implementada em breve.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+           <RestaurantsTable />
         </TabsContent>
       </Tabs>
     </div>
