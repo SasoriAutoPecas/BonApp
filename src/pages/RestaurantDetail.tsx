@@ -70,7 +70,7 @@ const RestaurantDetailPage = () => {
       setReviewsLoading(true);
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, profile:profiles!user_id(first_name, last_name)')
+        .select('*, profile:profiles(first_name, last_name)')
         .eq('restaurant_id', id)
         .order('created_at', { ascending: false });
 

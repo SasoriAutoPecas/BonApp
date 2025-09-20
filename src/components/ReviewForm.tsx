@@ -56,7 +56,7 @@ export const ReviewForm = ({ restaurantId, onReviewAdded }: ReviewFormProps) => 
         rating: values.rating,
         comment: values.comment,
       })
-      .select('*, profile:profiles!user_id(first_name, last_name)')
+      .select('*, profile:profiles(first_name, last_name)')
       .single();
 
     if (error) {
