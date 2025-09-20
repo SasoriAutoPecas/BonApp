@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 interface Restaurant {
@@ -31,37 +31,41 @@ const itemVariants = {
   },
 };
 
-const HomeScreen = () => {
+const Dashboard = () => {
   const session = useAuthStore((state) => state.session);
+  const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    const fetchUserRestaurants = async () => {
+      if (!session) return;
       setLoading(true);
       const { data, error } = await supabase
         .from('restaurants')
-        .select('id, name, description, image_url');
+        .select('id, name, description, image_url')
+        .eq('owner_id', session.user.id);
 
       if (error) {
-        console.error('Error fetching restaurants:', error);
+        console.error('Error fetching user restaurants:', error);
       } else {
         setRestaurants(data || []);
       }
       setLoading(false);
     };
 
-    fetchRestaurants();
-  }, []);
+    fetchUserRestaurants();
+  }, [session]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    navigate('/');
   };
 
   return (
     <div className="container mx-auto p-4">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">BonApp</h1>
+        <h1 className="text-3xl font-bold">Meu Painel</h1>
         <div className="flex items-center gap-4">
           {session && <p className="text-sm text-muted-foreground">Logado como: {session.user.email}</p>}
           <Button onClick={handleSignOut} variant="outline">Sair</Button>
@@ -70,16 +74,16 @@ const HomeScreen = () => {
 
       <main>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Restaurantes</h2>
+          <h2 className="text-2xl font-semibold">Meus Restaurantes</h2>
           <Button asChild>
             <Link to="/add-restaurant">Adicionar Restaurante</Link>
           </Button>
         </div>
         {loading ? (
-          <p>Carregando restaurantes...</p>
+          <p>Carregando seus restaurantes...</p>
         ) : restaurants.length === 0 ? (
           <div className="mt-8 p-8 border rounded-lg bg-card text-center">
-            <p className="text-lg">Nenhum restaurante encontrado ainda. Que tal adicionar o primeiro?</p>
+            <p className="text-lg">Você ainda não adicionou nenhum restaurante. Que tal adicionar o primeiro?</p>
           </div>
         ) : (
           <motion.div 
@@ -114,4 +118,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default Dashboard;

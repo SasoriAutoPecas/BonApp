@@ -5,11 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
-import HomeScreen from "./pages/HomeScreen";
 import AddRestaurantPage from "./pages/AddRestaurant";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { useAuthStore } from "./stores/authStore";
+import PublicHomePage from "./pages/PublicHome";
+import RestaurantDetailPage from "./pages/RestaurantDetail";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +28,8 @@ const AppRoutes = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (!session) {
-        navigate('/auth');
+      if (_event === 'SIGNED_OUT') {
+        navigate('/');
       }
     });
 
@@ -36,10 +38,13 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/" />} />
+      {/* Public Routes */}
+      <Route path="/" element={<PublicHomePage />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+      <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/dashboard" />} />
       
       {/* Protected Routes */}
-      <Route path="/" element={session ? <HomeScreen /> : <Navigate to="/auth" />} />
+      <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/auth" />} />
       <Route path="/add-restaurant" element={session ? <AddRestaurantPage /> : <Navigate to="/auth" />} />
 
       <Route path="*" element={<NotFound />} />

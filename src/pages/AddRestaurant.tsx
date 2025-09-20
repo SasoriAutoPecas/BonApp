@@ -61,7 +61,7 @@ const AddRestaurantPage = () => {
       showError('Ocorreu um erro ao adicionar o restaurante: ' + error.message);
     } else {
       showSuccess('Restaurante adicionado com sucesso!');
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 
@@ -131,7 +131,7 @@ const AddRestaurantPage = () => {
                 )}
               />
               <div className="flex justify-end gap-2">
-                 <Button type="button" variant="outline" onClick={() => navigate('/')}>
+                 <Button type="button" variant="outline" onClick={() => navigate('/dashboard')}>
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={form.formState.isSubmitting}>

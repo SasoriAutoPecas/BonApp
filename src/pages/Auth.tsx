@@ -11,7 +11,7 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (session) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [session, navigate]);
 
@@ -21,17 +21,19 @@ const AuthPage = () => {
         <h1 className="text-3xl font-bold text-center font-heading">BonApp</h1>
         <Auth
           supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          providers={[]}
-          theme="light"
-          variables={{
-            default: {
-              colors: {
-                brand: '#FF6B6B',
-                brandAccent: '#E95050'
+          appearance={{ 
+            theme: ThemeSupa,
+            variables: {
+              default: {
+                colors: {
+                  brand: '#FF6B6B',
+                  brandAccent: '#E95050'
+                }
               }
             }
           }}
+          providers={[]}
+          theme="light"
         />
       </div>
     </div>
