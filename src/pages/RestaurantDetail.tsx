@@ -24,13 +24,25 @@ interface Restaurant {
   accessibility_details: string | null;
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  profile: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+}
+
 const RestaurantDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
   const { session } = useAuthStore();
   const { profile } = useProfileStore();
-  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -51,6 +63,31 @@ const RestaurantDetailPage = () => {
     };
     fetchRestaurant();
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchReviews = async () => {
+      setReviewsLoading(true);
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*, profile:profiles(first_name, last_name)')
+        .eq('restaurant_id', id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching reviews:', error);
+      } else {
+        setReviews(data as any[]);
+      }
+      setReviewsLoading(false);
+    };
+
+    fetchReviews();
+  }, [id]);
+
+  const handleReviewAdded = (newReview: Review) => {
+    setReviews(currentReviews => [newReview, ...currentReviews]);
+  };
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
@@ -154,7 +191,7 @@ const RestaurantDetailPage = () => {
             {session && profile?.role === 'user' ? (
               <ReviewForm 
                 restaurantId={restaurant.id} 
-                onReviewAdded={() => setReviewRefreshKey(prev => prev + 1)} 
+                onReviewAdded={handleReviewAdded} 
               />
             ) : (
               <p className="text-muted-foreground">
@@ -165,7 +202,7 @@ const RestaurantDetailPage = () => {
           </div>
           <div className="md:col-span-2">
             <h3 className="text-2xl font-bold font-heading mb-4">O que outros dizem</h3>
-            <ReviewList restaurantId={restaurant.id} refreshKey={reviewRefreshKey} />
+            <ReviewList reviews={reviews} loading={reviewsLoading} />
           </div>
         </div>
       </main>

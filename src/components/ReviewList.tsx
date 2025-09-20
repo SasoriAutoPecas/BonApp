@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { StarRating } from './StarRating';
@@ -18,34 +16,11 @@ interface Review {
 }
 
 interface ReviewListProps {
-  restaurantId: string;
-  refreshKey: number;
+  reviews: Review[];
+  loading: boolean;
 }
 
-export const ReviewList = ({ restaurantId, refreshKey }: ReviewListProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*, profile:profiles(first_name, last_name)')
-        .eq('restaurant_id', restaurantId)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching reviews:', error);
-      } else {
-        setReviews(data as any[]);
-      }
-      setLoading(false);
-    };
-
-    fetchReviews();
-  }, [restaurantId, refreshKey]);
-
+export const ReviewList = ({ reviews, loading }: ReviewListProps) => {
   if (loading) {
     return <p>Carregando avaliações...</p>;
   }

@@ -14,9 +14,21 @@ const reviewSchema = z.object({
   comment: z.string().min(10, { message: 'O comentário deve ter pelo menos 10 caracteres.' }),
 });
 
+// Definindo o tipo da avaliação para garantir consistência
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  profile: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+}
+
 interface ReviewFormProps {
   restaurantId: string;
-  onReviewAdded: () => void;
+  onReviewAdded: (newReview: Review) => void;
 }
 
 export const ReviewForm = ({ restaurantId, onReviewAdded }: ReviewFormProps) => {
@@ -36,19 +48,23 @@ export const ReviewForm = ({ restaurantId, onReviewAdded }: ReviewFormProps) => 
       return;
     }
 
-    const { error } = await supabase.from('reviews').insert({
-      restaurant_id: restaurantId,
-      user_id: session.user.id,
-      rating: values.rating,
-      comment: values.comment,
-    });
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert({
+        restaurant_id: restaurantId,
+        user_id: session.user.id,
+        rating: values.rating,
+        comment: values.comment,
+      })
+      .select('*, profile:profiles(first_name, last_name)')
+      .single();
 
     if (error) {
       showError('Erro ao enviar avaliação: ' + error.message);
-    } else {
+    } else if (data) {
       showSuccess('Avaliação enviada com sucesso!');
       form.reset();
-      onReviewAdded();
+      onReviewAdded(data as any);
     }
   };
 
