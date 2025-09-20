@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { Link } from 'react-router-dom';
 
 interface Restaurant {
   id: string;
@@ -49,12 +50,17 @@ const HomeScreen = () => {
       </header>
 
       <main>
-        <h2 className="text-2xl font-semibold mb-4">Restaurantes</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Restaurantes</h2>
+          <Button asChild>
+            <Link to="/add-restaurant">Adicionar Restaurante</Link>
+          </Button>
+        </div>
         {loading ? (
           <p>Carregando restaurantes...</p>
         ) : restaurants.length === 0 ? (
           <div className="mt-8 p-8 border rounded-lg bg-gray-50 text-center">
-            <p className="text-lg">Nenhum restaurante encontrado ainda. Volte em breve!</p>
+            <p className="text-lg">Nenhum restaurante encontrado ainda. Que tal adicionar o primeiro?</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

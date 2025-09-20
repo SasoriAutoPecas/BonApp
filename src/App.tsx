@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import HomeScreen from "./pages/HomeScreen";
+import AddRestaurantPage from "./pages/AddRestaurant";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { useAuthStore } from "./stores/authStore";
@@ -35,11 +36,12 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      {session ? (
-        <Route path="/" element={<HomeScreen />} />
-      ) : (
-        <Route path="/auth" element={<AuthPage />} />
-      )}
+      <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/" />} />
+      
+      {/* Protected Routes */}
+      <Route path="/" element={session ? <HomeScreen /> : <Navigate to="/auth" />} />
+      <Route path="/add-restaurant" element={session ? <AddRestaurantPage /> : <Navigate to="/auth" />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
