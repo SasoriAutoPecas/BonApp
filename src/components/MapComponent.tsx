@@ -1,5 +1,20 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Corrige o problema do ícone padrão do marcador no Leaflet com bundlers como o Vite
+const DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 interface Restaurant {
   id: string;
