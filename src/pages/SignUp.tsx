@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
+import { CnpjInput } from '@/components/CnpjInput';
 
 const formSchema = z.object({
   first_name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
@@ -163,7 +164,7 @@ const SignUpPage = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>CNPJ</FormLabel>
-                      <FormControl><Input placeholder="00.000.000/0000-00" {...field} /></FormControl>
+                      <FormControl><CnpjInput {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
