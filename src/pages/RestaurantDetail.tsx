@@ -6,6 +6,10 @@ import { ArrowLeft, Clock, Phone, Globe, Accessibility } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Footer } from '@/components/Footer';
 import { Separator } from '@/components/ui/separator';
+import { useAuthStore } from '@/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { ReviewForm } from '@/components/ReviewForm';
+import { ReviewList } from '@/components/ReviewList';
 
 interface Restaurant {
   id: string;
@@ -24,6 +28,9 @@ const RestaurantDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
+  const { session } = useAuthStore();
+  const { profile } = useProfileStore();
+  const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -68,7 +75,7 @@ const RestaurantDetailPage = () => {
             <Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Voltar</Link>
           </Button>
         </div>
-        <Card>
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-4xl font-heading">{restaurant.name}</CardTitle>
           </CardHeader>
@@ -138,6 +145,29 @@ const RestaurantDetailPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Separator className="my-8" />
+
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="md:col-span-1">
+            <h3 className="text-2xl font-bold font-heading mb-4">Deixe sua Avaliação</h3>
+            {session && profile?.role === 'user' ? (
+              <ReviewForm 
+                restaurantId={restaurant.id} 
+                onReviewAdded={() => setReviewRefreshKey(prev => prev + 1)} 
+              />
+            ) : (
+              <p className="text-muted-foreground">
+                {session ? 'Apenas usuários podem deixar avaliações.' : <Link to="/auth" className="text-primary underline">Faça login</Link>}{' '}
+                para deixar uma avaliação.
+              </p>
+            )}
+          </div>
+          <div className="md:col-span-2">
+            <h3 className="text-2xl font-bold font-heading mb-4">O que outros dizem</h3>
+            <ReviewList restaurantId={restaurant.id} refreshKey={reviewRefreshKey} />
+          </div>
+        </div>
       </main>
       <Footer />
     </div>
