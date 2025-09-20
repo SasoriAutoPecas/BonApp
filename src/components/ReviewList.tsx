@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { StarRating } from './StarRating';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -11,7 +11,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
-  profile: {
+  profiles: {
     first_name: string | null;
     last_name: string | null;
   } | null;
@@ -31,7 +31,7 @@ export const ReviewList = ({ restaurantId, refreshKey }: ReviewListProps) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, profile:profiles(first_name, last_name)')
+        .select('*, profiles(first_name, last_name)')
         .eq('restaurant_id', restaurantId)
         .order('created_at', { ascending: false });
 
@@ -62,13 +62,13 @@ export const ReviewList = ({ restaurantId, refreshKey }: ReviewListProps) => {
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarFallback>
-                  {review.profile?.first_name?.[0] || 'U'}
-                  {review.profile?.last_name?.[0] || ''}
+                  {review.profiles?.first_name?.[0] || 'U'}
+                  {review.profiles?.last_name?.[0] || ''}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-base">
-                  {review.profile?.first_name || 'Usuário'} {review.profile?.last_name || ''}
+                  {review.profiles?.first_name || 'Usuário'} {review.profiles?.last_name || ''}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: ptBR })}
