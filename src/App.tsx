@@ -18,6 +18,9 @@ import MapPage from "./pages/MapPage";
 import SignUpPage from "./pages/SignUp";
 import AdminDashboard from "./pages/AdminDashboard";
 import DashboardLayout from "./components/DashboardLayout";
+import TermsPage from "./pages/Terms";
+import AboutPage from "./pages/About";
+import CuisinesPage from "./pages/Cuisines";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +60,9 @@ const AppRoutes = () => {
       <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/termos" element={<TermsPage />} />
+      <Route path="/sobre-nos" element={<AboutPage />} />
+      <Route path="/culinarias" element={<CuisinesPage />} />
       
       {/* Routes that can be public or private */}
       <Route path="/map" element={<MapPage />} />
