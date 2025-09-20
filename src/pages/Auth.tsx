@@ -10,11 +10,22 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { showSuccess, showError } from '@/utils/toast';
 
@@ -26,6 +37,9 @@ const formSchema = z.object({
 const AuthPage = () => {
   const navigate = useNavigate();
   const session = useAuthStore((state) => state.session);
+  const [resetEmail, setResetEmail] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,8 +65,24 @@ const AuthPage = () => {
 
     if (error) {
       showError('E-mail ou senha inválidos.');
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      showError('Por favor, insira seu e-mail.');
+      return;
+    }
+    setIsResetting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+    setIsResetting(false);
+    if (error) {
+      showError(error.message);
     } else {
-      // A navegação será tratada pelo onAuthStateChange no App.tsx
+      showSuccess('Link para redefinição de senha enviado! Verifique seu e-mail.');
+      setIsDialogOpen(false);
     }
   };
 
@@ -89,6 +119,47 @@ const AuthPage = () => {
                   </FormItem>
                 )}
               />
+              <div className="text-right text-sm -mt-4">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="p-0 h-auto font-normal">
+                      Esqueceu a senha?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Redefinir Senha</DialogTitle>
+                      <DialogDescription>
+                        Digite seu e-mail abaixo para receber um link de redefinição de senha.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="email-reset" className="text-right">
+                          E-mail
+                        </Label>
+                        <Input
+                          id="email-reset"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          className="col-span-3"
+                          placeholder="seu@email.com"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Cancelar
+                        </Button>
+                      </DialogClose>
+                      <Button onClick={handlePasswordReset} disabled={isResetting}>
+                        {isResetting ? 'Enviando...' : 'Enviar Link'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? 'Entrando...' : 'Entrar'}
               </Button>

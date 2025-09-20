@@ -21,6 +21,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import TermsPage from "./pages/Terms";
 import AboutPage from "./pages/About";
 import CuisinesPage from "./pages/Cuisines";
+import UpdatePasswordPage from "./pages/UpdatePassword";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const AppRoutes = () => {
       <Route path="/termos" element={<TermsPage />} />
       <Route path="/sobre-nos" element={<AboutPage />} />
       <Route path="/culinarias" element={<CuisinesPage />} />
+      <Route path="/update-password" element={<UpdatePasswordPage />} />
       
       {/* Routes that can be public or private */}
       <Route path="/map" element={<MapPage />} />
