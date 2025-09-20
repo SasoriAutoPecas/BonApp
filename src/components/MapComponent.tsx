@@ -1,46 +1,57 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Link } from 'react-router-dom';
-import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Corrige o problema do ícone padrão do marcador no Leaflet com bundlers como o Vite
-const DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+import { createCuisineIcon, createUserIcon } from './CuisineIcon';
+import { useEffect } from 'react';
 
 interface Restaurant {
   id: string;
   name: string;
   latitude: number;
   longitude: number;
+  cuisine: string | null;
 }
 
 interface MapComponentProps {
   restaurants: Restaurant[];
+  userPosition: [number, number] | null;
 }
 
-const MapComponent = ({ restaurants }: MapComponentProps) => {
-  const position: [number, number] = [-14.235, -51.9253]; // Centro do Brasil
+const ChangeView = ({ center, zoom }: { center: [number, number], zoom: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, zoom);
+    }
+  }, [center, zoom, map]);
+  return null;
+};
+
+const MapComponent = ({ restaurants, userPosition }: MapComponentProps) => {
+  const initialPosition: [number, number] = userPosition || [-14.235, -51.9253];
+  const initialZoom = userPosition ? 13 : 4;
 
   return (
-    <MapContainer center={position} zoom={4} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+    <MapContainer center={initialPosition} zoom={initialZoom} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+      <ChangeView center={initialPosition} zoom={initialZoom} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      {userPosition && (
+        <Marker position={userPosition} icon={createUserIcon()}>
+          <Popup>Você está aqui!</Popup>
+        </Marker>
+      )}
       {restaurants.map(restaurant => (
-        <Marker key={restaurant.id} position={[restaurant.latitude, restaurant.longitude]}>
+        <Marker 
+          key={restaurant.id} 
+          position={[restaurant.latitude, restaurant.longitude]}
+          icon={createCuisineIcon(restaurant.cuisine)}
+        >
           <Popup>
             <div className="font-sans">
               <h3 className="font-bold font-heading">{restaurant.name}</h3>
+              <p className="text-sm text-muted-foreground">{restaurant.cuisine || 'Culinária não definida'}</p>
               <Link to={`/restaurant/${restaurant.id}`} className="text-primary hover:underline text-sm">
                 Ver detalhes
               </Link>

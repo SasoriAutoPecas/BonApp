@@ -11,6 +11,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,10 +30,13 @@ const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
   description: z.string().optional(),
   address: z.string().optional(),
+  cuisine: z.string().optional(),
   image_url: z.string().optional(),
   latitude: z.coerce.number().optional(),
   longitude: z.coerce.number().optional(),
 });
+
+const cuisineTypes = ["Italiana", "Japonesa", "Brasileira", "Vegetariana", "Outra"];
 
 const EditRestaurantPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,6 +71,7 @@ const EditRestaurantPage = () => {
           name: data.name,
           description: data.description || '',
           address: data.address || '',
+          cuisine: data.cuisine || '',
           image_url: data.image_url || '',
           latitude: data.latitude || undefined,
           longitude: data.longitude || undefined,
@@ -77,6 +88,7 @@ const EditRestaurantPage = () => {
         name: values.name,
         description: values.description,
         address: values.address,
+        cuisine: values.cuisine,
         image_url: values.image_url,
         latitude: values.latitude,
         longitude: values.longitude,
@@ -109,6 +121,28 @@ const EditRestaurantPage = () => {
                     <FormControl>
                       <Input placeholder="Ex: Cantina da Nona" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cuisine"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Culinária</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um tipo de culinária" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {cuisineTypes.map(type => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
