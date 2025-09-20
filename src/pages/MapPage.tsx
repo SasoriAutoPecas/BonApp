@@ -108,7 +108,7 @@ const MapPage = () => {
           </div>
         </div>
       </header>
-      <main className="flex-grow relative">
+      <main className="flex-grow relative z-0">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p>Carregando mapa...</p>
