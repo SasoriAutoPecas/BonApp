@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
-import HomePage from "./pages/Home";
+import HomeScreen from "./pages/HomeScreen";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { useAuthStore } from "./stores/authStore";
@@ -27,8 +27,6 @@ const AppRoutes = () => {
       setSession(session);
       if (!session) {
         navigate('/auth');
-      } else {
-        navigate('/');
       }
     });
 
@@ -38,7 +36,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       {session ? (
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomeScreen />} />
       ) : (
         <Route path="/auth" element={<AuthPage />} />
       )}
