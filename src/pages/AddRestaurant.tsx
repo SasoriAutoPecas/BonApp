@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +27,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
 import { ImageUploader } from '@/components/ImageUploader';
+import { useDebounce } from '@/hooks/useDebounce';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
@@ -38,9 +42,12 @@ const formSchema = z.object({
 
 const cuisineTypes = ["Italiana", "Japonesa", "Brasileira", "Vegetariana", "Outra"];
 
+type GeocodingStatus = 'idle' | 'loading' | 'success' | 'error';
+
 const AddRestaurantPage = () => {
   const session = useAuthStore((state) => state.session);
   const navigate = useNavigate();
+  const [geocodingStatus, setGeocodingStatus] = useState<GeocodingStatus>('idle');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,6 +58,35 @@ const AddRestaurantPage = () => {
       image_url: '',
     },
   });
+
+  const addressValue = form.watch('address');
+  const debouncedAddress = useDebounce(addressValue, 1000);
+
+  useEffect(() => {
+    if (debouncedAddress && debouncedAddress.length > 5) {
+      const geocodeAddress = async () => {
+        setGeocodingStatus('loading');
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(debouncedAddress)}&format=json&limit=1`);
+          const data = await response.json();
+          if (data && data.length > 0) {
+            const { lat, lon } = data[0];
+            form.setValue('latitude', parseFloat(lat));
+            form.setValue('longitude', parseFloat(lon));
+            setGeocodingStatus('success');
+          } else {
+            setGeocodingStatus('error');
+          }
+        } catch (error) {
+          console.error("Geocoding error:", error);
+          setGeocodingStatus('error');
+        }
+      };
+      geocodeAddress();
+    } else {
+      setGeocodingStatus('idle');
+    }
+  }, [debouncedAddress, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!session) {
@@ -78,6 +114,19 @@ const AddRestaurantPage = () => {
     } else {
       showSuccess('Restaurante adicionado com sucesso!');
       navigate('/dashboard');
+    }
+  };
+
+  const renderGeocodingStatus = () => {
+    switch (geocodingStatus) {
+      case 'loading':
+        return <span className="flex items-center text-sm text-muted-foreground"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Buscando coordenadas...</span>;
+      case 'success':
+        return <span className="flex items-center text-sm text-green-600"><CheckCircle2 className="mr-2 h-4 w-4" /> Coordenadas encontradas!</span>;
+      case 'error':
+        return <span className="flex items-center text-sm text-red-600"><XCircle className="mr-2 h-4 w-4" /> Endereço não encontrado. Verifique.</span>;
+      default:
+        return <FormDescription>Digite o endereço para buscar as coordenadas automaticamente.</FormDescription>;
     }
   };
 
@@ -149,40 +198,13 @@ const AddRestaurantPage = () => {
                   <FormItem>
                     <FormLabel>Endereço</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Rua das Flores, 123" {...field} />
+                      <Input placeholder="Ex: Av. Paulista, 900, São Paulo, SP" {...field} />
                     </FormControl>
+                    {renderGeocodingStatus()}
                     <FormMessage />
                   </FormItem>
                 )}
               />
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="latitude"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Latitude</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="any" placeholder="-23.550520" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="longitude"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Longitude</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="any" placeholder="-46.633308" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
               <FormField
                 control={form.control}
                 name="image_url"
@@ -203,7 +225,7 @@ const AddRestaurantPage = () => {
                  <Button type="button" variant="outline" onClick={() => navigate('/dashboard')}>
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={form.formState.isSubmitting}>
+                <Button type="submit" disabled={form.formState.isSubmitting || geocodingStatus === 'loading'}>
                   {form.formState.isSubmitting ? 'Adicionando...' : 'Adicionar Restaurante'}
                 </Button>
               </div>
