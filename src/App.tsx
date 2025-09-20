@@ -2,11 +2,50 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
+import AuthPage from "./pages/Auth";
+import HomePage from "./pages/Home";
+import { useEffect } from "react";
+import { supabase } from "./integrations/supabase/client";
+import { useAuthStore } from "./stores/authStore";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const navigate = useNavigate();
+  const { session, setSession } = useAuthStore();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        navigate('/auth');
+      } else {
+        navigate('/');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setSession, navigate]);
+
+  return (
+    <Routes>
+      {session ? (
+        <Route path="/" element={<HomePage />} />
+      ) : (
+        <Route path="/auth" element={<AuthPage />} />
+      )}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +53,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
