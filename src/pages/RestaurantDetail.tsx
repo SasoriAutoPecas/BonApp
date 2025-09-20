@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Clock, Phone, Globe, Accessibility } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Footer } from '@/components/Footer';
+import { Separator } from '@/components/ui/separator';
 
 interface Restaurant {
   id: string;
@@ -12,6 +13,11 @@ interface Restaurant {
   description: string | null;
   address: string | null;
   image_url: string | null;
+  phone_number: string | null;
+  website: string | null;
+  operating_hours: string | null;
+  has_wheelchair_access: boolean | null;
+  accessibility_details: string | null;
 }
 
 const RestaurantDetailPage = () => {
@@ -64,7 +70,7 @@ const RestaurantDetailPage = () => {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-4xl">{restaurant.name}</CardTitle>
+            <CardTitle className="text-4xl font-heading">{restaurant.name}</CardTitle>
           </CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-8">
             <div>
@@ -80,11 +86,55 @@ const RestaurantDetailPage = () => {
                 </div>
               )}
             </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">Sobre o restaurante</h3>
-              <p className="text-muted-foreground">{restaurant.description || 'Nenhuma descrição fornecida.'}</p>
-              <h3 className="text-xl font-semibold">Endereço</h3>
-              <p className="text-muted-foreground">{restaurant.address || 'Endereço não informado.'}</p>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-semibold font-heading">Sobre o restaurante</h3>
+                <p className="text-muted-foreground mt-2">{restaurant.description || 'Nenhuma descrição fornecida.'}</p>
+              </div>
+              <Separator />
+              <div>
+                <h3 className="text-xl font-semibold font-heading mb-4">Informações</h3>
+                <div className="space-y-4 text-muted-foreground">
+                  <div className="flex items-start">
+                    <Clock size={20} className="mr-3 mt-1 text-primary flex-shrink-0" />
+                    <div>
+                      <span className="font-semibold text-foreground">Horários:</span>
+                      <p className="whitespace-pre-line">{restaurant.operating_hours || 'Não informado'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone size={20} className="mr-3 text-primary" />
+                    <span className="font-semibold text-foreground">Telefone:</span>
+                    <span className="ml-2">{restaurant.phone_number || 'Não informado'}</span>
+                  </div>
+                   <div className="flex items-center">
+                    <Globe size={20} className="mr-3 text-primary" />
+                    <span className="font-semibold text-foreground">Website:</span>
+                    {restaurant.website ? (
+                      <a href={restaurant.website} target="_blank" rel="noopener noreferrer" className="ml-2 text-primary hover:underline">
+                        Visitar site
+                      </a>
+                    ) : (
+                      <span className="ml-2">Não informado</span>
+                    )}
+                  </div>
+                  <div className="flex items-start">
+                    <Accessibility size={20} className="mr-3 mt-1 text-primary flex-shrink-0" />
+                    <div>
+                      <span className="font-semibold text-foreground">Acessibilidade:</span>
+                      <p>{restaurant.has_wheelchair_access ? 'Acessível para cadeirantes' : 'Informação não disponível'}</p>
+                      {restaurant.has_wheelchair_access && restaurant.accessibility_details && (
+                        <p className="text-sm">{restaurant.accessibility_details}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+               <Separator />
+               <div>
+                <h3 className="text-xl font-semibold font-heading">Endereço</h3>
+                <p className="text-muted-foreground mt-2">{restaurant.address || 'Endereço não informado.'}</p>
+              </div>
             </div>
           </CardContent>
         </Card>

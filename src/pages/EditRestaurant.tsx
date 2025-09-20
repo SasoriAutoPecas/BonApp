@@ -28,6 +28,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { ImageUploader } from '@/components/ImageUploader';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
@@ -37,6 +38,11 @@ const formSchema = z.object({
   image_url: z.string().optional(),
   latitude: z.coerce.number().optional(),
   longitude: z.coerce.number().optional(),
+  phone_number: z.string().optional(),
+  website: z.string().url({ message: "Por favor, insira uma URL válida." }).optional().or(z.literal('')),
+  operating_hours: z.string().optional(),
+  has_wheelchair_access: z.boolean().default(false).optional(),
+  accessibility_details: z.string().optional(),
 });
 
 const cuisineTypes = ["Italiana", "Japonesa", "Brasileira", "Vegetariana", "Outra"];
@@ -55,6 +61,11 @@ const EditRestaurantPage = () => {
       description: '',
       address: '',
       image_url: '',
+      phone_number: '',
+      website: '',
+      operating_hours: '',
+      has_wheelchair_access: false,
+      accessibility_details: '',
     },
   });
 
@@ -103,13 +114,18 @@ const EditRestaurantPage = () => {
         navigate('/dashboard');
       } else if (data) {
         form.reset({
-          name: data.name,
+          ...data,
           description: data.description || '',
           address: data.address || '',
           cuisine: data.cuisine || '',
           image_url: data.image_url || '',
           latitude: data.latitude || undefined,
           longitude: data.longitude || undefined,
+          phone_number: data.phone_number || '',
+          website: data.website || '',
+          operating_hours: data.operating_hours || '',
+          has_wheelchair_access: data.has_wheelchair_access || false,
+          accessibility_details: data.accessibility_details || '',
         });
         if (data.latitude && data.longitude) {
           setGeocodingStatus('success');
@@ -122,15 +138,7 @@ const EditRestaurantPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { error } = await supabase
       .from('restaurants')
-      .update({ 
-        name: values.name,
-        description: values.description,
-        address: values.address,
-        cuisine: values.cuisine,
-        image_url: values.image_url,
-        latitude: values.latitude,
-        longitude: values.longitude,
-      })
+      .update({ ...values })
       .eq('id', id);
 
     if (error) {
@@ -182,7 +190,7 @@ const EditRestaurantPage = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Culinária</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione um tipo de culinária" />
@@ -225,6 +233,77 @@ const EditRestaurantPage = () => {
                       <Input placeholder="Ex: Av. Paulista, 900, São Paulo, SP" {...field} />
                     </FormControl>
                     {renderGeocodingStatus()}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(11) 99999-9999" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://seurestaurante.com.br" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="operating_hours"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Horário de Funcionamento</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Ex: Seg-Sex: 11h-23h, Sáb: 12h-00h" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="has_wheelchair_access"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Possui acesso para cadeirantes?
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="accessibility_details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Detalhes de Acessibilidade</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Ex: Rampa de acesso na entrada, banheiro adaptado." {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
