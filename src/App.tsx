@@ -12,6 +12,7 @@ import { useAuthStore } from "./stores/authStore";
 import PublicHomePage from "./pages/PublicHome";
 import RestaurantDetailPage from "./pages/RestaurantDetail";
 import Dashboard from "./pages/Dashboard";
+import EditRestaurantPage from "./pages/EditRestaurant";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const AppRoutes = () => {
       {/* Protected Routes */}
       <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/auth" />} />
       <Route path="/add-restaurant" element={session ? <AddRestaurantPage /> : <Navigate to="/auth" />} />
+      <Route path="/edit-restaurant/:id" element={session ? <EditRestaurantPage /> : <Navigate to="/auth" />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
