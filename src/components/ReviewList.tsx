@@ -11,7 +11,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
-  profiles: {
+  profile: {
     first_name: string | null;
     last_name: string | null;
   } | null;
@@ -31,7 +31,7 @@ export const ReviewList = ({ restaurantId, refreshKey }: ReviewListProps) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, profiles(first_name, last_name)')
+        .select('*, profile:profiles(first_name, last_name)')
         .eq('restaurant_id', restaurantId)
         .order('created_at', { ascending: false });
 
@@ -62,13 +62,13 @@ export const ReviewList = ({ restaurantId, refreshKey }: ReviewListProps) => {
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarFallback>
-                  {review.profiles?.first_name?.[0] || 'U'}
-                  {review.profiles?.last_name?.[0] || ''}
+                  {review.profile?.first_name?.[0] || 'U'}
+                  {review.profile?.last_name?.[0] || ''}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <CardTitle className="text-base">
-                  {review.profiles?.first_name || 'Usuário'} {review.profiles?.last_name || ''}
+                  {review.profile?.first_name || 'Usuário'} {review.profile?.last_name || ''}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: ptBR })}
