@@ -78,7 +78,7 @@ const MapPage = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col">
-       <header className="p-4 bg-card border-b z-10 flex items-center justify-between gap-4 flex-wrap">
+       <header className="relative p-4 bg-card border-b z-50 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4">
           <Button asChild variant="outline" size="icon">
             <Link to="/"><ArrowLeft size={16} /></Link>
