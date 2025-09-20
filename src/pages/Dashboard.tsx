@@ -14,11 +14,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
-import { useProfileStore } from '@/stores/profileStore';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { showSuccess, showError } from '@/utils/toast';
-import { Pencil, Trash2, Shield } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface Restaurant {
   id: string;
@@ -47,8 +46,6 @@ const itemVariants = {
 
 const Dashboard = () => {
   const session = useAuthStore((state) => state.session);
-  const { profile } = useProfileStore();
-  const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,11 +71,6 @@ const Dashboard = () => {
     fetchUserRestaurants();
   }, [session]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
   const handleDelete = async (restaurantId: string) => {
     const { error } = await supabase
       .from('restaurants')
@@ -95,32 +87,20 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div>
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Meu Painel</h1>
-        <div className="flex items-center gap-4">
-          {session && <p className="text-sm text-muted-foreground">Logado como: {session.user.email}</p>}
-          {profile?.role === 'admin' && (
-            <Button asChild variant="secondary">
-              <Link to="/admin"><Shield className="mr-2 h-4 w-4" /> Painel Admin</Link>
-            </Button>
-          )}
-          <Button onClick={handleSignOut} variant="outline">Sair</Button>
-        </div>
+        <h1 className="text-3xl font-bold">Meus Restaurantes</h1>
+        <Button asChild>
+          <Link to="/add-restaurant">Adicionar Restaurante</Link>
+        </Button>
       </header>
 
       <main>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Meus Restaurantes</h2>
-          <Button asChild>
-            <Link to="/add-restaurant">Adicionar Restaurante</Link>
-          </Button>
-        </div>
         {loading ? (
           <p>Carregando seus restaurantes...</p>
         ) : restaurants.length === 0 ? (
           <div className="mt-8 p-8 border rounded-lg bg-card text-center">
-            <p className="text-lg">Você ainda não adicionou nenhum restaurante. Que tal adicionar o primeiro?</p>
+            <p className="text-lg">Você ainda não adicionou nenhum restaurante.</p>
           </div>
         ) : (
           <motion.div 
