@@ -24,6 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
 import { ImageUploader } from '@/components/ImageUploader';
@@ -54,6 +55,7 @@ type GeocodingStatus = 'idle' | 'loading' | 'success' | 'error';
 
 const AddRestaurantPage = () => {
   const session = useAuthStore((state) => state.session);
+  const { profile, loading: profileLoading } = useProfileStore();
   const navigate = useNavigate();
   const [geocodingStatus, setGeocodingStatus] = useState<GeocodingStatus>('idle');
 
@@ -74,6 +76,13 @@ const AddRestaurantPage = () => {
 
   const addressValue = form.watch('address');
   const debouncedAddress = useDebounce(addressValue, 1000);
+
+  useEffect(() => {
+    if (!profileLoading && profile?.role === 'user') {
+      showError("Você não tem permissão para acessar esta página.");
+      navigate('/dashboard');
+    }
+  }, [profile, profileLoading, navigate]);
 
   useEffect(() => {
     if (debouncedAddress && debouncedAddress.length > 5) {
@@ -136,6 +145,14 @@ const AddRestaurantPage = () => {
         return <FormDescription>Digite o endereço para buscar as coordenadas automaticamente.</FormDescription>;
     }
   };
+
+  if (profileLoading) {
+    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
+  }
+
+  if (profile?.role === 'user') {
+    return null;
+  }
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen bg-gray-50">

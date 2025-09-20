@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { showSuccess, showError } from '@/utils/toast';
@@ -46,6 +47,7 @@ const itemVariants = {
 
 const Dashboard = () => {
   const session = useAuthStore((state) => state.session);
+  const { profile } = useProfileStore();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -90,9 +92,11 @@ const Dashboard = () => {
     <div>
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Meus Restaurantes</h1>
-        <Button asChild>
-          <Link to="/add-restaurant">Adicionar Restaurante</Link>
-        </Button>
+        {(profile?.role === 'admin' || profile?.role === 'owner') && (
+          <Button asChild>
+            <Link to="/add-restaurant">Adicionar Restaurante</Link>
+          </Button>
+        )}
       </header>
 
       <main>

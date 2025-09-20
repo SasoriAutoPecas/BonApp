@@ -31,6 +31,7 @@ import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PhoneInput } from '@/components/PhoneInput';
 import { OperatingHoursInput } from '@/components/OperatingHoursInput';
+import { useProfileStore } from '@/stores/profileStore';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
@@ -54,6 +55,7 @@ type GeocodingStatus = 'idle' | 'loading' | 'success' | 'error';
 const EditRestaurantPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile, loading: profileLoading } = useProfileStore();
   const [geocodingStatus, setGeocodingStatus] = useState<GeocodingStatus>('idle');
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -73,6 +75,13 @@ const EditRestaurantPage = () => {
 
   const addressValue = form.watch('address');
   const debouncedAddress = useDebounce(addressValue, 1000);
+
+  useEffect(() => {
+    if (!profileLoading && profile?.role === 'user') {
+      showError("Você não tem permissão para acessar esta página.");
+      navigate('/dashboard');
+    }
+  }, [profile, profileLoading, navigate]);
 
   useEffect(() => {
     if (debouncedAddress && debouncedAddress.length > 5) {
@@ -163,6 +172,14 @@ const EditRestaurantPage = () => {
         return <FormDescription>Altere o endereço para buscar novas coordenadas.</FormDescription>;
     }
   };
+
+  if (profileLoading) {
+    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
+  }
+
+  if (profile?.role === 'user') {
+    return null;
+  }
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-screen bg-gray-50">

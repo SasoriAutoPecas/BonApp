@@ -38,10 +38,12 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
           <Home className="h-5 w-5" />
           <span className={cn("ml-3", !isOpen && "hidden")}>Meus Restaurantes</span>
         </NavLink>
-        <NavLink to="/add-restaurant" className={navLinkClasses}>
-          <PlusCircle className="h-5 w-5" />
-          <span className={cn("ml-3", !isOpen && "hidden")}>Adicionar</span>
-        </NavLink>
+        {(profile?.role === 'admin' || profile?.role === 'owner') && (
+          <NavLink to="/add-restaurant" className={navLinkClasses}>
+            <PlusCircle className="h-5 w-5" />
+            <span className={cn("ml-3", !isOpen && "hidden")}>Adicionar</span>
+          </NavLink>
+        )}
         <NavLink to="/map" className={navLinkClasses}>
           <Map className="h-5 w-5" />
           <span className={cn("ml-3", !isOpen && "hidden")}>Mapa</span>
