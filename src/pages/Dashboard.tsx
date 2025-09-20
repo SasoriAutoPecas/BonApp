@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { showSuccess, showError } from '@/utils/toast';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, Shield } from 'lucide-react';
 
 interface Restaurant {
   id: string;
@@ -46,6 +47,7 @@ const itemVariants = {
 
 const Dashboard = () => {
   const session = useAuthStore((state) => state.session);
+  const { profile } = useProfileStore();
   const navigate = useNavigate();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,6 +100,11 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold">Meu Painel</h1>
         <div className="flex items-center gap-4">
           {session && <p className="text-sm text-muted-foreground">Logado como: {session.user.email}</p>}
+          {profile?.role === 'admin' && (
+            <Button asChild variant="secondary">
+              <Link to="/admin"><Shield className="mr-2 h-4 w-4" /> Painel Admin</Link>
+            </Button>
+          )}
           <Button onClick={handleSignOut} variant="outline">Sair</Button>
         </div>
       </header>

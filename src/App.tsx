@@ -9,35 +9,40 @@ import AddRestaurantPage from "./pages/AddRestaurant";
 import { useEffect } from "react";
 import { supabase } from "./integrations/supabase/client";
 import { useAuthStore } from "./stores/authStore";
+import { useProfileStore } from "./stores/profileStore";
 import PublicHomePage from "./pages/PublicHome";
 import RestaurantDetailPage from "./pages/RestaurantDetail";
 import Dashboard from "./pages/Dashboard";
 import EditRestaurantPage from "./pages/EditRestaurant";
 import MapPage from "./pages/MapPage";
 import SignUpPage from "./pages/SignUp";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const navigate = useNavigate();
   const { session, setSession } = useAuthStore();
+  const { fetchProfile } = useProfileStore();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      fetchProfile(session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      fetchProfile(session);
       if (_event === 'SIGNED_OUT') {
         navigate('/');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setSession, navigate]);
+  }, [setSession, navigate, fetchProfile]);
 
   return (
     <Routes>
@@ -52,6 +57,7 @@ const AppRoutes = () => {
       <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/auth" />} />
       <Route path="/add-restaurant" element={session ? <AddRestaurantPage /> : <Navigate to="/auth" />} />
       <Route path="/edit-restaurant/:id" element={session ? <EditRestaurantPage /> : <Navigate to="/auth" />} />
+      <Route path="/admin" element={session ? <AdminDashboard /> : <Navigate to="/auth" />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
