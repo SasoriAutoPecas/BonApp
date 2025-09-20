@@ -14,6 +14,7 @@ import RestaurantDetailPage from "./pages/RestaurantDetail";
 import Dashboard from "./pages/Dashboard";
 import EditRestaurantPage from "./pages/EditRestaurant";
 import MapPage from "./pages/MapPage";
+import SignUpPage from "./pages/SignUp";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const AppRoutes = () => {
       <Route path="/map" element={<MapPage />} />
       <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/dashboard" />} />
+      <Route path="/sign-up" element={!session ? <SignUpPage /> : <Navigate to="/dashboard" />} />
       
       {/* Protected Routes */}
       <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/auth" />} />

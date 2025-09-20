@@ -1,7 +1,7 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -34,7 +34,14 @@ const AuthPage = () => {
           }}
           providers={[]}
           theme="light"
+          view="sign_in"
         />
+        <p className="text-center text-sm text-muted-foreground">
+          Não tem uma conta?{' '}
+          <Link to="/sign-up" className="underline hover:text-primary">
+            Cadastre-se
+          </Link>
+        </p>
       </div>
     </div>
   );
