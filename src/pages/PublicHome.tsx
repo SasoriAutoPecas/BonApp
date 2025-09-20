@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '@/stores/authStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { RestaurantCardSkeleton } from '@/components/RestaurantCardSkeleton';
+import { Map } from 'lucide-react';
 
 interface Restaurant {
   id: string;
@@ -104,15 +105,20 @@ const PublicHomePage = () => {
     <div className="flex flex-col min-h-screen">
       <header className="container mx-auto p-4 flex justify-between items-center">
         <h1 className="text-3xl font-bold font-heading text-primary">BonApp</h1>
-        {session ? (
-          <Button asChild>
-            <Link to="/dashboard">Meu Painel</Link>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link to="/map"><Map className="mr-2 h-4 w-4" /> Ver no Mapa</Link>
           </Button>
-        ) : (
-          <Button asChild>
-            <Link to="/auth">Entrar</Link>
-          </Button>
-        )}
+          {session ? (
+            <Button asChild>
+              <Link to="/dashboard">Meu Painel</Link>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link to="/auth">Entrar</Link>
+            </Button>
+          )}
+        </div>
       </header>
       <main className="flex-grow container mx-auto p-4">
         <div className="text-center my-8 md:my-16">

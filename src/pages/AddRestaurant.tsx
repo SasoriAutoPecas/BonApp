@@ -24,6 +24,8 @@ const formSchema = z.object({
   description: z.string().optional(),
   address: z.string().optional(),
   image_url: z.string().optional(),
+  latitude: z.coerce.number().optional(),
+  longitude: z.coerce.number().optional(),
 });
 
 const AddRestaurantPage = () => {
@@ -54,6 +56,8 @@ const AddRestaurantPage = () => {
           description: values.description,
           address: values.address,
           image_url: values.image_url,
+          latitude: values.latitude,
+          longitude: values.longitude,
           owner_id: session.user.id 
         },
       ]);
@@ -118,6 +122,34 @@ const AddRestaurantPage = () => {
                   </FormItem>
                 )}
               />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="latitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Latitude</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" placeholder="-23.550520" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="longitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Longitude</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" placeholder="-46.633308" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="image_url"

@@ -13,6 +13,7 @@ import PublicHomePage from "./pages/PublicHome";
 import RestaurantDetailPage from "./pages/RestaurantDetail";
 import Dashboard from "./pages/Dashboard";
 import EditRestaurantPage from "./pages/EditRestaurant";
+import MapPage from "./pages/MapPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<PublicHomePage />} />
+      <Route path="/map" element={<MapPage />} />
       <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
       <Route path="/auth" element={!session ? <AuthPage /> : <Navigate to="/dashboard" />} />
       
