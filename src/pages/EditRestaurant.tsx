@@ -17,12 +17,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useParams } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
+import { ImageUploader } from '@/components/ImageUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
   description: z.string().optional(),
   address: z.string().optional(),
-  image_url: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
+  image_url: z.string().optional(),
 });
 
 const EditRestaurantPage = () => {
@@ -38,6 +39,8 @@ const EditRestaurantPage = () => {
       image_url: '',
     },
   });
+
+  const existingImageUrl = form.watch('image_url');
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -137,11 +140,15 @@ const EditRestaurantPage = () => {
               <FormField
                 control={form.control}
                 name="image_url"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>URL da Imagem</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+                      <ImageUploader 
+                        initialImageUrl={existingImageUrl}
+                        onUploadSuccess={(url) => form.setValue('image_url', url, { shouldValidate: true, shouldDirty: true })}
+                        onUploadStart={() => form.formState.isSubmitting}
+                        onUploadEnd={() => !form.formState.isSubmitting}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

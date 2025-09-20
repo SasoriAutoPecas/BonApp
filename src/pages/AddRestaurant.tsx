@@ -17,12 +17,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/toast';
+import { ImageUploader } from '@/components/ImageUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'O nome deve ter pelo menos 2 caracteres.' }),
   description: z.string().optional(),
   address: z.string().optional(),
-  image_url: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
+  image_url: z.string().optional(),
 });
 
 const AddRestaurantPage = () => {
@@ -120,11 +121,14 @@ const AddRestaurantPage = () => {
               <FormField
                 control={form.control}
                 name="image_url"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>URL da Imagem</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
+                      <ImageUploader 
+                        onUploadSuccess={(url) => form.setValue('image_url', url)}
+                        onUploadStart={() => form.formState.isSubmitting}
+                        onUploadEnd={() => !form.formState.isSubmitting}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
