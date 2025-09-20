@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirme seu Cadastro - BonApp</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Nunito:wght@700;800&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #F8F9FA;
+      font-family: 'Inter', sans-serif;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #FFFFFF;
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #E9ECEF;
+    }
+    .header h1 {
+      font-family: 'Nunito', sans-serif;
+      color: #FF6B6B;
+      font-size: 32px;
+      margin: 0;
+    }
+    .content {
+      padding: 30px 20px;
+      text-align: center;
+      color: #343A40;
+      line-height: 1.6;
+    }
+    .content h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      margin: 20px 0;
+      background-color: #FF6B6B;
+      color: #FFFFFF;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+    }
+    .footer {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #E9ECEF;
+      font-size: 12px;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>BonApp</h1>
+    </div>
+    <div class="content">
+      <h2>Confirme seu E-mail</h2>
+      <p>Olá! Obrigado por se cadastrar no BonApp. Para começar a explorar os melhores restaurantes, por favor, confirme seu endereço de e-mail clicando no botão abaixo.</p>
+      <a href="{{ .ConfirmationURL }}" class="button">Confirmar E-mail</a>
+      <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+      <p style="word-break: break-all; font-size: 12px;">{{ .ConfirmationURL }}</p>
+    </div>
+    <div class="footer">
+      <p>Se você não se cadastrou no BonApp, por favor, ignore este e-mail.</p>
+      <p>&copy; 2024 BonApp. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
